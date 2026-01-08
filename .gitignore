@@ -1,7 +1,3 @@
-# Logs
-logs/
-*.log
-
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -35,22 +31,6 @@ bld/
 
 # Mono auto generated files
 mono_crash.*
-
-# Build Results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-[Ww][Ii][Nn]32/
-[Aa][Rr][Mm]/
-[Aa][Rr][Mm]64/
-bld/
-[Bb]in/
-[Oo]bj/
-[Ll]og/
-[Ll]ogs/
 
 # Visual Studio profiler
 *.psess
@@ -169,117 +149,16 @@ publish/
 # Microsoft Azure Web App publish settings
 PublishScripts/
 
-# Node.js
-node_modules/
-npm-debug.log
-yarn-error.log
-
-# TypeScript
-*.tsbuildinfo
-
-# Azure Functions
-local.settings.json
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# Logs
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# IDEs
-.idea/
-*.swp
-*.swo
-*~
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
-
-# Rider
-.idea/
-*.sln.iml
-
-# User-specific files (MonoDevelop/Xamarin Studio)
-*.userprefs
-
-# Mono auto generated files
-mono_crash.*
-
-# Build results for .NET
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-bld/
-[Bb]in/
-[Oo]bj/
-
-# Visual Studio Code
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-
-# Entity Framework Migrations (opcional, depende de tu estrategia)
-# Migrations/
-
 # Logs de Serilog
 logs/
 *.log
 
-# appsettings con datos sensibles (mejor usar user secrets)
+# appsettings con datos sensibles
 appsettings.Development.json
 appsettings.Production.json
 
 # Docker
 docker-compose.override.yml
-
-# Frontend (React) - si lo agregas después
-/Web/node_modules/
-/Web/build/
-/Web/dist/
-/Web/.next/
-/Web/out/
-/Web/.cache/
-/Web/coverage/
 
 # Archivos temporales
 *.tmp
@@ -296,4 +175,100 @@ docker-compose.override.yml
 *.pem
 
 # Archivos de configuración local
-#launchSettings.json
+launchSettings.json
+
+# ==========================================
+# FRONTEND (React/Node.js/Vite)
+# ==========================================
+
+# Dependencies
+web/node_modules/
+node_modules/
+jspm_packages/
+
+# Production builds
+web/dist/
+web/build/
+web/.next/
+web/out/
+dist/
+build/
+
+# Testing
+web/coverage/
+coverage/
+*.lcov
+.nyc_output
+
+# Cache directories
+web/.cache/
+.cache/
+.parcel-cache/
+.vite/
+web/.vite/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+web/.env
+web/.env.local
+web/.env.development.local
+web/.env.test.local
+web/.env.production.local
+
+# NPM/Yarn logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+
+# Editor directories and files
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Vite
+web/dist-ssr
+*.local
+
+# TypeScript
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Lock files (opcional, algunos prefieren versionarlos)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
