@@ -31,7 +31,13 @@ public class ExceptionHandlingMiddleware
 
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        _logger.LogError(exception, "Ocurrió una excepción: {Message}", exception.Message);
+        _logger.LogError(
+            exception,
+            "Error en request {Method} {Path} - StatusCode: {StatusCode} - Message: {Message}",
+            context.Request.Method,
+            context.Request.Path,
+            context.Response.StatusCode,
+            exception.Message);
 
         var problemDetails = exception switch
         {

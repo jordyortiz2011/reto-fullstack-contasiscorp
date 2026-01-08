@@ -22,43 +22,79 @@ public class CrearComprobanteCommandHandler : IRequestHandler<CrearComprobanteCo
 
     public async Task<ComprobanteDto> Handle(CrearComprobanteCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Creando comprobante tipo {Tipo}, serie {Serie}", request.Tipo, request.Serie);
-
-        // Obtener el siguiente número para la serie
-        var siguienteNumero = await _repository.GetNextNumeroAsync(request.Serie);
-
-        // Convertir items
-        var items = request.Items.Select(i => new ComprobanteItem(
-            i.Descripcion,
-            i.Cantidad,
-            i.PrecioUnitario
-        )).ToList();
-
-        // Crear el comprobante
-        var tipo = Enum.Parse<TipoComprobante>(request.Tipo);
-        var comprobante = new Comprobante(
-            tipo,
-            request.Serie,
-            siguienteNumero,
-            request.RucEmisor,
-            request.RazonSocialEmisor,
-            request.RucReceptor,
-            request.RazonSocialReceptor,
-            items
-        );
-
-        // Guardar
-        await _repository.AddAsync(comprobante);
-
         _logger.LogInformation(
-            "Comprobante creado exitosamente: {Id}, {Tipo} {Serie}-{Numero}", 
-            comprobante.Id, 
-            comprobante.Tipo, 
-            comprobante.Serie, 
-            comprobante.Numero);
+            "Iniciando creación de comprobante - Tipo: {Tipo}, Serie: {Serie}, RucEmisor: {RucEmisor}, RucReceptor: {RucReceptor}",
+            request.Tipo,
+            request.Serie,
+            request.RucEmisor,
+            request.RucReceptor ?? "N/A");
 
-        // Mapear a DTO
-        return MapToDto(comprobante);
+        try
+        {
+            // Obtener el siguiente número para la serie
+            var siguienteNumero = await _repository.GetNextNumeroAsync(request.Serie);
+
+            _logger.LogDebug(
+                "Número obtenido para serie {Serie}: {Numero}",
+                request.Serie,
+                siguienteNumero);
+
+            // Convertir items
+            var items = request.Items.Select(i => new ComprobanteItem(
+                i.Descripcion,
+                i.Cantidad,
+                i.PrecioUnitario
+            )).ToList();
+
+            _logger.LogDebug(
+                "Items procesados: {CantidadItems}",
+                items.Count);
+
+            // Crear el comprobante
+            var tipo = Enum.Parse<TipoComprobante>(request.Tipo);
+            var comprobante = new Comprobante(
+                tipo,
+                request.Serie,
+                siguienteNumero,
+                request.RucEmisor,
+                request.RazonSocialEmisor,
+                request.RucReceptor,
+                request.RazonSocialReceptor,
+                items
+            );
+
+            _logger.LogDebug(
+                "Comprobante creado en memoria - SubTotal: {SubTotal}, IGV: {IGV}, Total: {Total}",
+                comprobante.SubTotal,
+                comprobante.IGV,
+                comprobante.Total);
+
+            // Guardar
+            await _repository.AddAsync(comprobante);
+
+            _logger.LogInformation(
+                "Comprobante creado exitosamente - ID: {ComprobanteId}, Tipo: {Tipo}, Serie-Numero: {Serie}-{Numero}, Total: {Total}, RucEmisor: {RucEmisor}, RucReceptor: {RucReceptor}",
+                comprobante.Id,
+                comprobante.Tipo,
+                comprobante.Serie,
+                comprobante.Numero,
+                comprobante.Total,
+                comprobante.RucEmisor,
+                comprobante.RucReceptor ?? "N/A");
+
+            // Mapear a DTO
+            return MapToDto(comprobante);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error al crear comprobante - Tipo: {Tipo}, Serie: {Serie}, RucEmisor: {RucEmisor}",
+                request.Tipo,
+                request.Serie,
+                request.RucEmisor);
+            throw;
+        }
     }
 
     private ComprobanteDto MapToDto(Comprobante comprobante)
