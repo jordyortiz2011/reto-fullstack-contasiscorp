@@ -151,19 +151,40 @@ const ComprobanteForm = ({ onSuccess, onCancel }) => {
             onSuccess();
         } catch (err) {
             console.error('Error al crear comprobante:', err);
-            const errorMessage = err.response?.data?.detail ||
-                err.response?.data?.errors ||
-                err.message ||
-                'Error desconocido';
 
-            if (typeof errorMessage === 'object') {
-                const errorText = Object.entries(errorMessage)
-                    .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
-                    .join('\n');
-                setSubmitError(errorText);
-            } else {
-                setSubmitError(errorMessage);
+            let errorMessage = 'Error desconocido al crear el comprobante';
+
+            if (err.response && err.response.data) {
+                const data = err.response.data;
+
+                // Si es un error de validación con errores estructurados
+                if (data.errors && typeof data.errors === 'object') {
+                    const errorsList = Object.entries(data.errors)
+                        .map(([field, messages]) => {
+                            const fieldName = field.charAt(0).toUpperCase() + field.slice(1);
+                            const errorMessages = Array.isArray(messages) ? messages.join(', ') : messages;
+                            return `• ${fieldName}: ${errorMessages}`;
+                        })
+                        .join('\n');
+
+                    errorMessage = `Errores de validación:\n\n${errorsList}`;
+                }
+                // Si es un error con mensaje detail
+                else if (data.detail) {
+                    errorMessage = data.detail;
+                }
+                // Si es un error con mensaje simple
+                else if (data.message) {
+                    errorMessage = data.message;
+                }
+            } else if (err.message) {
+                errorMessage = err.message;
             }
+
+            setSubmitError(errorMessage);
+
+            // Scroll al top para mostrar el error
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         } finally {
             setLoading(false);
         }

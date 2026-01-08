@@ -26,9 +26,10 @@ const ComprobanteList = ({ onViewDetail, onRefresh }) => {
 
     const [showFilters, setShowFilters] = useState(false);
 
+    // Cargar comprobantes cuando cambia la página o el refresh
     useEffect(() => {
         loadComprobantes();
-    }, [pagination.page, pagination.pageSize, onRefresh]);
+    }, [pagination.page, onRefresh]);
 
     const loadComprobantes = async () => {
         try {
@@ -37,13 +38,27 @@ const ComprobanteList = ({ onViewDetail, onRefresh }) => {
 
             const params = {
                 page: pagination.page,
-                pageSize: pagination.pageSize,
-                ...(filters.tipo && { tipo: filters.tipo }),
-                ...(filters.estado && { estado: filters.estado }),
-                ...(filters.fechaDesde && { fechaDesde: filters.fechaDesde }),
-                ...(filters.fechaHasta && { fechaHasta: filters.fechaHasta }),
-                ...(filters.rucReceptor && { rucReceptor: filters.rucReceptor })
+                pageSize: pagination.pageSize
             };
+
+            // Agregar filtros solo si tienen valor
+            if (filters.tipo) {
+                params.tipo = filters.tipo;
+            }
+            if (filters.estado) {
+                params.estado = filters.estado;
+            }
+            if (filters.fechaDesde) {
+                params.fechaDesde = filters.fechaDesde;
+            }
+            if (filters.fechaHasta) {
+                params.fechaHasta = filters.fechaHasta;
+            }
+            if (filters.rucReceptor && filters.rucReceptor.trim()) {
+                params.rucReceptor = filters.rucReceptor.trim();
+            }
+
+            console.log('Params enviados:', params); // Debug
 
             const data = await comprobanteService.getAll(params);
             setComprobantes(data.items);
@@ -53,7 +68,8 @@ const ComprobanteList = ({ onViewDetail, onRefresh }) => {
                 totalPages: data.totalPages
             }));
         } catch (err) {
-            setError('Error al cargar los comprobantes: ' + err.message);
+            console.error('Error al cargar comprobantes:', err);
+            setError('Error al cargar los comprobantes: ' + (err.response?.data?.detail || err.message));
         } finally {
             setLoading(false);
         }
@@ -80,7 +96,9 @@ const ComprobanteList = ({ onViewDetail, onRefresh }) => {
     };
 
     const handleApplyFilters = () => {
+        // Resetear a página 1 cuando se aplican filtros
         setPagination(prev => ({ ...prev, page: 1 }));
+        // Forzar recarga
         loadComprobantes();
     };
 
@@ -93,7 +111,10 @@ const ComprobanteList = ({ onViewDetail, onRefresh }) => {
             rucReceptor: ''
         });
         setPagination(prev => ({ ...prev, page: 1 }));
-        setTimeout(loadComprobantes, 100);
+        // Esperar un momento para que se actualice el estado y recargar
+        setTimeout(() => {
+            loadComprobantes();
+        }, 100);
     };
 
     const getEstadoBadgeClass = (estado) => {
@@ -105,7 +126,14 @@ const ComprobanteList = ({ onViewDetail, onRefresh }) => {
     }
 
     if (error) {
-        return <div className="error">{error}</div>;
+        return (
+            <div className="error-container">
+                <div className="error">{error}</div>
+                <button className="btn-retry" onClick={loadComprobantes}>
+                    Reintentar
+                </button>
+            </div>
+        );
     }
 
     return (
@@ -204,7 +232,7 @@ const ComprobanteList = ({ onViewDetail, onRefresh }) => {
                     {comprobantes.length === 0 ? (
                         <tr>
                             <td colSpan="8" style={{ textAlign: 'center', padding: '40px' }}>
-                                No se encontraron comprobantes
+                                No se encontraron comprobantes con los filtros aplicados
                             </td>
                         </tr>
                     ) : (

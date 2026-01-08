@@ -35,15 +35,25 @@ public class ComprobanteRepository : IComprobanteRepository
             .Include(c => c.Items)
             .AsQueryable();
 
-        // Aplicar filtros
+        // Aplicar filtros con fechas normalizadas a UTC
         if (fechaDesde.HasValue)
         {
-            query = query.Where(c => c.FechaEmision >= fechaDesde.Value);
+            // Normalizar a UTC si no lo es
+            var fechaDesdeUtc = fechaDesde.Value.Kind == DateTimeKind.Unspecified
+                ? DateTime.SpecifyKind(fechaDesde.Value, DateTimeKind.Utc)
+                : fechaDesde.Value.ToUniversalTime();
+
+            query = query.Where(c => c.FechaEmision >= fechaDesdeUtc);
         }
 
         if (fechaHasta.HasValue)
         {
-            query = query.Where(c => c.FechaEmision <= fechaHasta.Value);
+            // Normalizar a UTC y agregar 23:59:59 para incluir todo el día
+            var fechaHastaUtc = fechaHasta.Value.Kind == DateTimeKind.Unspecified
+                ? DateTime.SpecifyKind(fechaHasta.Value.Date.AddDays(1).AddSeconds(-1), DateTimeKind.Utc)
+                : fechaHasta.Value.Date.AddDays(1).AddSeconds(-1).ToUniversalTime();
+
+            query = query.Where(c => c.FechaEmision <= fechaHastaUtc);
         }
 
         if (tipo.HasValue)

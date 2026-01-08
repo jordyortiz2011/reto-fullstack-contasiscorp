@@ -1,6 +1,6 @@
 # Sistema de Gestión de Comprobantes Electrónicos
 
-Sistema completo para la gestión de comprobantes electrónicos (Facturas y Boletas) según normativa SUNAT, desarrollado con .NET 8 y React 18.
+Sistema completo para la gestión de comprobantes electrónicos (Facturas y Boletas) según normativa SUNAT, desarrollado con .NET 8 y React 19.
 
 ## 🚀 Tecnologías Utilizadas
 
@@ -15,7 +15,7 @@ Sistema completo para la gestión de comprobantes electrónicos (Facturas y Bole
 - **Swagger/OpenAPI** - Documentación de API
 
 ### Frontend
-- **React 18** - Framework UI
+- **React 19** - Framework UI
 - **Vite** - Build tool
 - **Axios** - Cliente HTTP
 - **Lucide React** - Iconos

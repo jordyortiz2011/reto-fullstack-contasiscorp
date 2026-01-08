@@ -42,12 +42,13 @@ public class ExceptionHandlingMiddleware
             _ => CreateInternalServerErrorProblemDetails(exception)
         };
 
-        context.Response.ContentType = "application/problem+json";
+        context.Response.ContentType = "application/json";
         context.Response.StatusCode = problemDetails.Status ?? (int)HttpStatusCode.InternalServerError;
 
         var options = new JsonSerializerOptions
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true
         };
 
         var json = JsonSerializer.Serialize(problemDetails, options);
@@ -63,14 +64,18 @@ public class ExceptionHandlingMiddleware
                 g => g.Select(e => e.ErrorMessage).ToArray()
             );
 
-        return new ProblemDetails
+        var problemDetails = new ProblemDetails
         {
             Type = "https://tools.ietf.org/html/rfc7807",
             Title = "Validation Error",
             Status = (int)HttpStatusCode.BadRequest,
-            Detail = "Uno o más errores de validación ocurrieron.",
-            Extensions = { ["errors"] = errors }
+            Detail = "Uno o más errores de validación ocurrieron."
         };
+
+        // Agregar errores al diccionario Extensions
+        problemDetails.Extensions["errors"] = errors;
+
+        return problemDetails;
     }
 
     private ProblemDetails CreateNotFoundProblemDetails(ComprobanteNotFoundException exception)
